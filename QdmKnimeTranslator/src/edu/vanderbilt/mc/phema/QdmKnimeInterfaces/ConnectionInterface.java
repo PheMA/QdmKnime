@@ -1,4 +1,4 @@
-package edu.vanderbilt.mc.phema.QdmKnimeTranslatorInterfaces;
+package edu.vanderbilt.mc.phema.QdmKnimeInterfaces;
 
 import java.awt.Point;
 
