@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="C:/Users/Huan/Downloads/eclipselink-2.5.2.v20140319-9ad6abd/eclipselink/jlib/jpa/org.eclipse.persistence.jpa.modelgen_2.5.2.v20140319-9ad6abd.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Huan/Downloads/eclipselink-2.5.2.v20140319-9ad6abd/eclipselink/jlib/jpa/org.eclipse.persistence.jpars.source_2.5.2.v20140319-9ad6abd.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Huan/Downloads/eclipselink-2.5.2.v20140319-9ad6abd/eclipselink/jlib/jpa/org.eclipse.persistence.jpars_2.5.2.v20140319-9ad6abd.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Huan/Downloads/zip4j_1.3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
