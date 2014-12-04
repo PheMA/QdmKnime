@@ -10,11 +10,11 @@ public interface TemporalRelationshipInterface extends NodeInterface {
 	public static enum TemporalTypeCode {
 		CONCURRENT, DURING, EAE, EAS, EBE, EBS, ECW, ECWS, EDU, OVERLAP, SAE, SAS, SBE, SBS, SCW, SCWE, SDU		
 	};
-	void setLeftId (String element_id);
-	void setRightId (String element_id);
+	void setLeftId (int element_node_id);
+	void setRightId (int element_node_id);
 	void setTemporalTypeCode (TemporalTypeCode typeCode);
-	String getLeftId ();  // QDM data element ID
-	String getRightId();
+	int getLeftId ();  // QDM data element node ID
+	int getRightId();
 	void setOperator(Operator operator);
 	void setQuantity(float quantity);
 	void setUnit(Unit unit);

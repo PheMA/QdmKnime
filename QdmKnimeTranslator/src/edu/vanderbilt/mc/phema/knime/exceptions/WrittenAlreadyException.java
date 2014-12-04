@@ -46,6 +46,14 @@ public class WrittenAlreadyException extends RuntimeException {
 		// TODO Auto-generated constructor stub
 	}
 
+	public WrittenAlreadyException(int nodeId){
+		super("Node " + nodeId + "has been written, and its folder has been created. ");
+	}
+	
+	public WrittenAlreadyException(int nodeId, Throwable cause){
+		super("Node " + nodeId + "has been written, and its folder has been created. ", cause);
+	}
+	
 	/**
 	 * @param message
 	 * @param cause

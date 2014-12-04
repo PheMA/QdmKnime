@@ -3,6 +3,7 @@
  */
 package edu.vanderbilt.mc.phema.QdmKnime;
 
+import edu.vanderbilt.mc.phema.knime.jaxb.Config;
 import edu.vanderbilt.mc.phema.knime.jaxb.Entry;
 import edu.vanderbilt.mc.phema.knime.jaxb.EntryType;
 
@@ -20,5 +21,33 @@ public class Toolkit {
 		return anEntry;
 	}
 	
+	public static Config nodeUIsettings(int x, int y, int width, int height){
+		/*
+		 * Example:
+		 * <config key="ui_settings">
+		 * <config key="extrainfo.node.bounds">
+		 * <entry key="array-size" type="xint" value="4"/>
+		 * <entry key="0" type="xint" value="391"/>
+		 * <entry key="1" type="xint" value="324"/>
+		 * <entry key="2" type="xint" value="114"/>
+		 * <entry key="3" type="xint" value="66"/>
+		 * </config>
+		 * </config>
+		 */
+		Config ui_settings = new Config();
+		ui_settings.setKey("ui_settings");
+
+		Config extrainfo = new Config();
+		extrainfo.setKey("extrainfo.node.bounds");
+		extrainfo.getEntryOrConfig().add(makeEntry("array-size", EntryType.XINT, "4"));
+		extrainfo.getEntryOrConfig().add(makeEntry("0", EntryType.XINT, String.valueOf(x)));
+		extrainfo.getEntryOrConfig().add(makeEntry("1", EntryType.XINT, String.valueOf(y)));
+		extrainfo.getEntryOrConfig().add(makeEntry("2", EntryType.XINT, String.valueOf(width)));
+		extrainfo.getEntryOrConfig().add(makeEntry("3", EntryType.XINT, String.valueOf(height)));
+		
+		ui_settings.getEntryOrConfig().add(extrainfo);
+		
+		return ui_settings;
+	}
 	
 }

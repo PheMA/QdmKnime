@@ -1,12 +1,14 @@
 package edu.vanderbilt.mc.phema.QdmKnimeInterfaces;
 
+import edu.vanderbilt.mc.phema.knime.exceptions.SetUpIncompleteException;
+
 public interface LogicalRelationshipInterface extends NodeInterface {
 	public static enum EntityLevel {patient, event};
 	public static enum LogicalTypeCode {AND, OR, AND_NOT};
-	void setLeftId (String element_id);
-	void setRightId (String element_id);
+	void setLeftId (int element_node_id);
+	void setRightId (int element_node_id);
 	void setLogicalTypeCode(LogicalTypeCode typeCode);
 	LogicalTypeCode getLogicalTypeCode();
-	String getOutputElementId(int port);  // null if it is patient level data?
-	EntityLevel getOutputEntityLevel(int port);
+	int getOutputElementId(int port) throws IndexOutOfBoundsException, SetUpIncompleteException;  // null if it is patient level data?
+	EntityLevel getOutputEntityLevel(int port) throws IndexOutOfBoundsException, SetUpIncompleteException;
 }
