@@ -4,15 +4,25 @@
 package edu.vanderbilt.mc.phema.QdmKnime;
 
 import java.awt.Point;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FileUtils;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface;
 import edu.vanderbilt.mc.phema.knime.exceptions.SetUpIncompleteException;
 import edu.vanderbilt.mc.phema.knime.exceptions.WrittenAlreadyException;
 import edu.vanderbilt.mc.phema.knime.jaxb.Config;
 import edu.vanderbilt.mc.phema.knime.jaxb.EntryType;
+import edu.vanderbilt.mc.phema.knime.jaxb.ObjectFactory;
 
 /**
  * @author Huan
@@ -26,6 +36,8 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 	
 	private Path workflowRoot;
 	
+	private Path tempFolder;
+	
 	private LogicalTypeCode logic; 
 	
 	private boolean written = false;
@@ -34,7 +46,7 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 	
 	private final Point nodeLocation = new Point(0, 0);
 	
-	String customDescription;
+	String customDescription = "";
 	
 	private final int NUM_INPORTS = 2;
 	
@@ -45,12 +57,15 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 	private int nodeWidth = 130;
 	private int nodeHeight = 67;
 	
-	private int leftElementNodeId;
-	private int rightElementNodeId;
+	private int leftElementNodeId  = Integer.MIN_VALUE;
+	private int rightElementNodeId = Integer.MIN_VALUE;
 	
 	private ArrayList<m_OutPort> myOutPorts;   // Not sure if it is a good design
 	
-	private String folderName;
+	private String folderName;   // end folder name for the node "AND (#3)", defined in method write
+	
+	private Path sourceFolder = Paths.get("resources/metaNodeRepos/logicalOperators");
+	
 	
 	public LogicalRelationship() {
 		// TODO Auto-generated constructor stub
@@ -59,6 +74,16 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 	public LogicalRelationship(LogicalTypeCode typeCode){
 		logic = typeCode;
 		myOutPorts = m_getOutPorts();
+	}
+	
+	public LogicalRelationship(int id, LogicalTypeCode typeCode){
+		logic = typeCode;
+		myOutPorts = m_getOutPorts();
+		this.id = id;
+	}
+
+	public LogicalRelationship(int id){
+		this.id = id;
 	}
 	
 	/* (non-Javadoc)
@@ -71,6 +96,7 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 			throw new WrittenAlreadyException(id);
 		} else {
 			workflowRoot = Paths.get(dir);
+			tempFolder = workflowRoot.resolve("temp");
 		}
 	}
 
@@ -137,22 +163,97 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 	 */
 	@Override
 	public void write() throws WrittenAlreadyException,
-			SetUpIncompleteException {
+			SetUpIncompleteException, IOException, ZipException {
 		// TODO Auto-generated method stub
+		if (written) {
+			throw new WrittenAlreadyException(id);
+		}
+		if (workflowRoot == null){
+			throw new SetUpIncompleteException("Workflow root is not set up for Node" + id);
+		}
+		
+		Path tempZipPath = tempFolder.resolve(m_getZipFileName());
+		tempZipPath.toFile().mkdirs();  // To make sure the "temp" folder is there. Do I need to check success? 
+		
+		Path sourceZipPath = sourceFolder.resolve(m_getZipFileName());
+		
+		Files.copy(sourceZipPath, tempZipPath, StandardCopyOption.REPLACE_EXISTING); // throws IOException
+		
+		Path tempFolderForUnzip = tempFolder.resolve("unzip");
 
+		if (Files.exists(tempFolderForUnzip)){
+			FileUtils.deleteDirectory(tempFolderForUnzip.toFile());		
+		}
+
+		tempFolderForUnzip.toFile().mkdir();
+		
+		ZipFile zipFile = new ZipFile(tempZipPath.toString());
+		zipFile.extractAll(tempFolderForUnzip.toString());
+		
+		/*
+		 *  Set up $%{customDescription}%$
+		 * */
+		
+		Path workflowTemplate = tempFolderForUnzip.resolve(m_getInZipFolderName()).resolve("workflow.knime.template");
+		Path workflowInTemp = tempFolderForUnzip.resolve(m_getInZipFolderName()).resolve("workflow.knime");
+		
+		String workflowTemplateContent = Toolkit.readFile(
+				workflowTemplate.toString(), 
+				Charset.defaultCharset());
+		
+		String workflowOutContent = workflowTemplateContent.replace(
+				"$%{customDescription}%$", 
+				customDescription.isEmpty() ? getNodeName() : customDescription);
+		
+		PrintWriter outStream = new PrintWriter(workflowInTemp.toFile());
+		
+		outStream.print(workflowOutContent);
+		
+		outStream.close();
+		
+		workflowTemplate.toFile().deleteOnExit();
 		
 		
-		
-		String nodeName = getNodeName();
+		/*
+		 * Set up final target folder name, and make copy from temp
+		 * */
+		// String nodeName = getNodeName();
 		folderName = m_makeFolderName(); 
 		
+		Files.move(tempFolderForUnzip.resolve(m_getInZipFolderName()), 
+				workflowRoot.resolve(folderName), StandardCopyOption.REPLACE_EXISTING);
 		
+		written = true;
 		
 	}
 	
+	
+	/*
+	 *  After unzip, the folder name
+	 * */
+	private String m_getInZipFolderName(){
+		String name = "";
+		switch (logic) {
+			case AND: name = "AND"; break;
+			case OR: name = "OR"; break;
+			case AND_NOT: name = "AND_NOT"; break;
+		}
+		return name;
+	}
+	
+	private String m_getZipFileName(){
+		String name = "";
+		switch (logic) {
+			case AND: name = "AND.zip"; break;
+			case OR: name = "OR.zip"; break;
+			case AND_NOT: name = "AND_NOT.zip"; break;
+		}
+		return name;
+	}
+	
 	private String m_makeFolderName(){
-		String nodeName = getNodeName();
-		String fn = nodeName.substring(0, Math.min(nodeName.length(), 12))
+		String logicName = logic.name();
+		String fn = logicName.substring(0, Math.min(logicName.length(), 12))
 				+ " (#" + id + ")"; 
 		return fn;
 	}
@@ -161,7 +262,7 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getKnimeWorkflowConfig()
 	 */
 	@Override
-	public Config getKnimeWorkflowConfig() throws SetUpIncompleteException {
+	public Config getKnimeWorkflowConfig(ObjectFactory elementFactory) throws SetUpIncompleteException {
 		// TODO Auto-generated method stub
 		/*
 		 * Example:
@@ -188,22 +289,23 @@ public class LogicalRelationship implements LogicalRelationshipInterface {
 			throw new SetUpIncompleteException();
 		}
 		
-		Config nodeRootConfig = new Config();
+		Config nodeRootConfig = elementFactory.createConfig();
 		nodeRootConfig.setKey("node_" + id);
 		nodeRootConfig.getEntryOrConfig().add(
-				Toolkit.makeEntry("id", EntryType.XINT, String.valueOf(id)));
+				Toolkit.makeEntry("id", EntryType.XINT, String.valueOf(id), elementFactory));
 		nodeRootConfig.getEntryOrConfig().add(
 				Toolkit.makeEntry("node_settings_file", EntryType.XSTRING, 
-				(folderName == null ? m_makeFolderName() : folderName) + "/workflow.knime"));
+				(folderName == null ? m_makeFolderName() : folderName) + "/workflow.knime", elementFactory));
 		nodeRootConfig.getEntryOrConfig().add(
-				Toolkit.makeEntry("node_is_meta", EntryType.XBOOLEAN, "true"));
+				Toolkit.makeEntry("node_is_meta", EntryType.XBOOLEAN, "true", elementFactory));
 		nodeRootConfig.getEntryOrConfig().add(
-				Toolkit.makeEntry("node_type", EntryType.XSTRING, "MetaNode"));
+				Toolkit.makeEntry("node_type", EntryType.XSTRING, "MetaNode", elementFactory));
 		nodeRootConfig.getEntryOrConfig().add(
-				Toolkit.makeEntry("ui_classname", EntryType.XSTRING, "org.knime.core.node.workflow.NodeUIInformation"));
+				Toolkit.makeEntry("ui_classname", 
+						EntryType.XSTRING, "org.knime.core.node.workflow.NodeUIInformation", elementFactory));
 		
 		nodeRootConfig.getEntryOrConfig().add(
-				Toolkit.nodeUIsettings(nodeLocation.x, nodeLocation.y, nodeWidth, nodeHeight));
+				Toolkit.nodeUIsettings(nodeLocation.x, nodeLocation.y, nodeWidth, nodeHeight, elementFactory));
 		
 		
 		return nodeRootConfig;

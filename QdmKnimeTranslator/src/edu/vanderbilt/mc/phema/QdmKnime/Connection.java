@@ -10,6 +10,7 @@ import edu.vanderbilt.mc.phema.QdmKnimeInterfaces.ConnectionInterface;
 import edu.vanderbilt.mc.phema.knime.jaxb.Config;
 import edu.vanderbilt.mc.phema.knime.jaxb.Entry;
 import edu.vanderbilt.mc.phema.knime.jaxb.EntryType;
+import edu.vanderbilt.mc.phema.knime.jaxb.ObjectFactory;
 
 /**
  * @author Huan
@@ -89,30 +90,30 @@ public class Connection implements ConnectionInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.ConnectionInterface#getKnimeWorkflowConfig()
 	 */
 	@Override
-	public Config getKnimeWorkflowConfig() {
+	public Config getKnimeWorkflowConfig(ObjectFactory elementFactory) {
 		// TODO Auto-generated method stub
-		Config connectionXml = new Config();
+		Config connectionXml = elementFactory.createConfig();
 		connectionXml.setKey("connnection_" + id);
 		
-		Entry entrySourceID = new Entry();
+		Entry entrySourceID = elementFactory.createEntry();
 		entrySourceID.setKey("sourceID");
 		entrySourceID.setType(EntryType.XINT);
 		entrySourceID.setValue(String.valueOf(sourceID));		
 		connectionXml.getEntryOrConfig().add(entrySourceID);
 		
-		Entry entryDestID = new Entry();
+		Entry entryDestID = elementFactory.createEntry();
 		entryDestID.setKey("destID");
 		entryDestID.setType(EntryType.XINT);
 		entryDestID.setValue(String.valueOf(destID));		
 		connectionXml.getEntryOrConfig().add(entryDestID);
 
-		Entry entrySourcePort = new Entry();
+		Entry entrySourcePort = elementFactory.createEntry();
 		entrySourcePort.setKey("sourcePort");
 		entrySourcePort.setType(EntryType.XINT);
 		entrySourcePort.setValue(String.valueOf(sourcePort));		
 		connectionXml.getEntryOrConfig().add(entrySourcePort);
 		
-		Entry entryDestPort = new Entry();
+		Entry entryDestPort = elementFactory.createEntry();
 		entryDestPort.setKey("destPort");
 		entryDestPort.setType(EntryType.XINT);
 		entryDestPort.setValue(String.valueOf(destPort));		
@@ -120,15 +121,15 @@ public class Connection implements ConnectionInterface {
 		
 		/* work on bendpoints */
 		if (! bendpoints.isEmpty())	{
-			Entry entryConnUIClass = new Entry();
+			Entry entryConnUIClass = elementFactory.createEntry();
 			entryConnUIClass.setKey("ui_classname");
 			entryConnUIClass.setType(EntryType.XSTRING);
 			entryConnUIClass.setValue("org.knime.core.node.workflow.ConnectionUIInformation");
 			connectionXml.getEntryOrConfig().add(entryConnUIClass);
 		
-			Config bendpointsXml = new Config();
+			Config bendpointsXml = elementFactory.createConfig();
 			bendpointsXml.setKey("ui_settings");
-			Entry entryBendpointsSize = new Entry();
+			Entry entryBendpointsSize = elementFactory.createEntry();
 			entryBendpointsSize.setKey("extrainfo.conn.bendpoints_size");
 			entryBendpointsSize.setType(EntryType.XINT);
 			entryBendpointsSize.setValue(String.valueOf(bendpoints.size()));
@@ -137,22 +138,22 @@ public class Connection implements ConnectionInterface {
 			for (int i = 0; i < bendpoints.size(); i++){
 				Point pt = bendpoints.get(i);
 
-				Config onePoint = new Config();
+				Config onePoint = elementFactory.createConfig();
 				onePoint.setKey("extrainfo.conn.bendpoints_" + i);
 
-				Entry entryDim = new Entry();
+				Entry entryDim = elementFactory.createEntry();
 				entryDim.setKey("array-size");
 				entryDim.setType(EntryType.XINT);
 				entryDim.setValue("2");
 				onePoint.getEntryOrConfig().add(entryDim);
 
-				Entry entryX = new Entry();
+				Entry entryX = elementFactory.createEntry();
 				entryX.setKey("0");
 				entryX.setType(EntryType.XINT);
 				entryX.setValue(String.valueOf(pt.x));
 				onePoint.getEntryOrConfig().add(entryX);
 				
-				Entry entryY = new Entry();
+				Entry entryY = elementFactory.createEntry();
 				entryY.setKey("1");
 				entryY.setType(EntryType.XINT);
 				entryY.setValue(String.valueOf(pt.y));

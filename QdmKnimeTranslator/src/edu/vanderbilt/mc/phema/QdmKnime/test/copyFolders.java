@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import edu.vanderbilt.mc.phema.QdmKnime.Connection;
+//import edu.vanderbilt.mc.phema.QdmKnime.Connection;
 
 /**
  * @author Huan
@@ -49,8 +49,8 @@ public class copyFolders {
 		
 	//	System.out.println(sourceFolder.toString());
 		
-		Path newFolder = Paths.get("qdmKnime/AND.zip");
-		Path target = tempFolder.resolve(newFolder);
+		Path newFile = Paths.get("qdmKnime/AND.zip");
+		Path target = tempFolder.resolve(newFile);
 		
 				
 				

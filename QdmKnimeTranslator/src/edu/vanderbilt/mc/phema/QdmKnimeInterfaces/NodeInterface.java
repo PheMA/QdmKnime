@@ -1,8 +1,12 @@
 package edu.vanderbilt.mc.phema.QdmKnimeInterfaces;
 
+import java.io.IOException;
+
+import net.lingala.zip4j.exception.ZipException;
 import edu.vanderbilt.mc.phema.knime.exceptions.SetUpIncompleteException;
 import edu.vanderbilt.mc.phema.knime.exceptions.WrittenAlreadyException;
 import edu.vanderbilt.mc.phema.knime.jaxb.Config;
+import edu.vanderbilt.mc.phema.knime.jaxb.ObjectFactory;
 
 
 public interface NodeInterface {
@@ -15,10 +19,10 @@ public interface NodeInterface {
 //	void setHeight(int height);
 	void setCustomDescription(String description) throws WrittenAlreadyException;
 
-	void write() throws WrittenAlreadyException, SetUpIncompleteException;    // Execution, write files. Final step. After this step, the object should be write only
+	void write() throws WrittenAlreadyException, SetUpIncompleteException, IOException, ZipException;    // Execution, write files. Final step. After this step, the object should be write only
 //	String getPmml();  // The PMML segment for KNIME work flow
 
-	Config getKnimeWorkflowConfig() throws SetUpIncompleteException;
+	Config getKnimeWorkflowConfig(ObjectFactory elementFactory) throws SetUpIncompleteException;
 	
 //	boolean isReadOnly();   // after write(), the node should be read only
 	int getId();
