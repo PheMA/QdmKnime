@@ -84,12 +84,6 @@ public abstract class MetaNode implements NodeInterface {
 		nodeLocation.y = y;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setCustomDescription(java.lang.String)
-	 */
-	@Override
-	abstract public void setCustomDescription(String description)
-			throws WrittenAlreadyException;
 
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#write()

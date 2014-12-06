@@ -17,7 +17,6 @@ public interface NodeInterface {
 	void setY(int y);
 //	void setWidth(int width);
 //	void setHeight(int height);
-	void setCustomDescription(String description) throws WrittenAlreadyException;
 
 	void write() throws WrittenAlreadyException, SetUpIncompleteException, IOException, ZipException;    // Execution, write files. Final step. After this step, the object should be write only
 //	String getPmml();  // The PMML segment for KNIME work flow

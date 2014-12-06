@@ -16,9 +16,12 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.commons.io.FileUtils;
 
+import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 import edu.vanderbilt.phema.QdmKnime.Connection;
-import edu.vanderbilt.phema.QdmKnime.LogicalRelationship;
+import edu.vanderbilt.phema.QdmKnime.LogicalOperator;
 import edu.vanderbilt.phema.QdmKnime.Toolkit;
 import edu.vanderbilt.phema.QdmKnimeInterfaces.LogicalRelationshipInterface.LogicalTypeCode;
 import edu.vanderbilt.phema.knime.exceptions.SetUpIncompleteException;
@@ -55,7 +58,9 @@ public class WorkflowLogicConnect {
 		Path testPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve("qdmKnime");
 		testPath.toFile().mkdirs();
 		
-		Path newPackagePath = testPath.resolve("foo");
+		String projectName = "foo";
+		
+		Path newPackagePath = testPath.resolve(projectName);
 		if (Files.exists(newPackagePath)){
 			FileUtils.deleteDirectory(newPackagePath.toFile());		
 		}
@@ -83,7 +88,7 @@ public class WorkflowLogicConnect {
 		rootConfig.getEntryOrConfig().add(nodesConfig);
 		
 		int nodeAId = newNode();
-		LogicalRelationship nodeA = new LogicalRelationship(nodeAId, LogicalTypeCode.AND);
+		LogicalOperator nodeA = new LogicalOperator(nodeAId, LogicalTypeCode.AND);
 		
 		nodeA.setWorkflowRoot(newPackagePath.toString());
 		
@@ -94,7 +99,7 @@ public class WorkflowLogicConnect {
 		nodesConfig.getEntryOrConfig().add(nodeA.getKnimeWorkflowConfig(elementFactory));
 		
 		int nodeBId = newNode();
-		LogicalRelationship nodeB = new LogicalRelationship(nodeBId, LogicalTypeCode.OR);
+		LogicalOperator nodeB = new LogicalOperator(nodeBId, LogicalTypeCode.OR);
 		
 		nodeB.setWorkflowRoot(newPackagePath.toString());
 		
@@ -140,6 +145,15 @@ public class WorkflowLogicConnect {
 		
 		mars.marshal(jaxbRoot, outStream);
 		outStream.close();
+		
+		Path targetZipFile = testPath.resolve(projectName + ".zip");
+		targetZipFile.toFile().delete();
+		
+		ZipFile zipFile = new ZipFile(targetZipFile.toString());
+		ZipParameters parameters = new ZipParameters();
+		parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+		parameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
+		zipFile.addFolder(newPackagePath.toString(), parameters);
 		
 		System.out.println(newPackagePath.toString());
 		
