@@ -377,7 +377,9 @@ public class LogicalRelationship extends MetaNode implements LogicalRelationship
 		switch (logic) {
 			case OR:
 				outPorts.add(new m_OutPort(currentNodeId, EntityLevel.patient));
-				outPorts.add(new m_OutPort(currentNodeId, EntityLevel.event));
+				outPorts.add(new m_OutPort(
+						leftElementNodeId == rightElementNodeId ? leftElementNodeId : currentNodeId, 
+						EntityLevel.event));
 				break;
 			case AND:
 				outPorts.add(new m_OutPort(leftElementNodeId, EntityLevel.event));
@@ -413,6 +415,33 @@ public class LogicalRelationship extends MetaNode implements LogicalRelationship
 	public String getFolderName() {
 		// TODO Auto-generated method stub
 		return folderName == null ? m_makeFolderName() : folderName;
+	}
+
+	@Override
+	public int[] getGoodOutPorts() {
+		// TODO Auto-generated method stub
+		
+		int[] GoodOutPorts;
+		
+		switch (logic) {
+			case AND:
+				GoodOutPorts = 
+					leftElementNodeId == rightElementNodeId ? new int[]{0, 2, 4} : new int[]{1, 2, 3};
+				break;
+			case OR:
+				GoodOutPorts = 
+					leftElementNodeId == rightElementNodeId ? new int[]{1} : new int[]{0};
+				break;
+			case AND_NOT:
+				GoodOutPorts = 
+					leftElementNodeId == rightElementNodeId ? new int[]{0} : new int[]{1};
+				break;
+			default:
+				GoodOutPorts = new int[]{};
+				break;
+		}
+		
+		return GoodOutPorts;
 	}
 
 

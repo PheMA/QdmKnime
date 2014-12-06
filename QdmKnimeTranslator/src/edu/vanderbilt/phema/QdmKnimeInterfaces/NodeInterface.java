@@ -29,6 +29,7 @@ public interface NodeInterface {
 	String getNodeKey();     // "node_10"
 	int getNumberOfInPorts();    // 2 for temporalRelationship (0, 1)
 	int getNumberOfOutPorts() throws SetUpIncompleteException;   // 2 for temporalRelationship
+	int[] getGoodOutPorts();
 	int getX();        // Left upper point on the canvas
 	int getY();
 	void setWidth(int w);

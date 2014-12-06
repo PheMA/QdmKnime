@@ -238,5 +238,8 @@ public abstract class MetaNode implements NodeInterface {
 	
 	@Override
 	abstract public String getFolderName();
+	
+	@Override
+	abstract public int[] getGoodOutPorts();
 
 }
