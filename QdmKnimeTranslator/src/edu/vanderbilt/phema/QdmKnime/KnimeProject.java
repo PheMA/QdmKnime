@@ -30,9 +30,9 @@ import edu.vanderbilt.phema.knime.jaxb.ObjectFactory;
  */
 public class KnimeProject {
 
-	private Path workingDir;
+	private final Path workingDir;
 	
-	private String projectName;
+	private final String projectName;
 	
 	private final ObjectFactory elementFactory = new ObjectFactory();
 	
@@ -61,27 +61,35 @@ public class KnimeProject {
 		Toolkit.addWorkflowOverHeads(rootConfig, elementFactory);
 	}
 
-	public void addKnimeNode (NodeInterface node){
+	public synchronized void addKnimeNode (NodeInterface node){
 		knimeNodes.add(node);
 	}
 	
-	public void addKnimeConnection (ConnectionInterface connection){
+	public synchronized void addKnimeNodes (ArrayList<NodeInterface> nodes){
+		knimeNodes.addAll(nodes);
+	}
+	
+	public synchronized void addKnimeConnection (ConnectionInterface connection){
 		knimeConnections.add(connection);
 	}
 	
-	public Path getProjectDir(){
+	public synchronized void addKnimeConnections (ArrayList<ConnectionInterface> connections){
+		knimeConnections.addAll(connections);
+	}
+	
+	public synchronized Path getProjectDir(){
 		return workingDir.resolve(projectName);
 	}
 	
-	public Path getWorkflowKnimePath(){
+	public synchronized Path getWorkflowKnimePath(){
 		return getProjectDir().resolve("workflow.knime");
 	}
 	
-	public Path getProjectZipPath(){
+	public synchronized Path getProjectZipPath(){
 		return workingDir.resolve(projectName + ".zip");
 	}
 	
-	public void buildProject() 
+	public synchronized void buildProject() 
 			throws WrittenAlreadyException, SetUpIncompleteException, 
 			IOException, ZipException, JAXBException {
 		Config nodesConfig = elementFactory.createConfig();

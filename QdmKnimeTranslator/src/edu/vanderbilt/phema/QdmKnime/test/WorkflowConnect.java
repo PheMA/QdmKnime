@@ -23,8 +23,10 @@ import net.lingala.zip4j.util.Zip4jConstants;
 import edu.vanderbilt.phema.QdmKnime.Connection;
 import edu.vanderbilt.phema.QdmKnime.KnimeProject;
 import edu.vanderbilt.phema.QdmKnime.LogicalOperator;
+import edu.vanderbilt.phema.QdmKnime.TemporalRelationship;
 import edu.vanderbilt.phema.QdmKnime.Toolkit;
 import edu.vanderbilt.phema.QdmKnimeInterfaces.LogicalRelationshipInterface.LogicalTypeCode;
+import edu.vanderbilt.phema.QdmKnimeInterfaces.TemporalRelationshipInterface.TemporalTypeCode;
 import edu.vanderbilt.phema.knime.exceptions.SetUpIncompleteException;
 import edu.vanderbilt.phema.knime.exceptions.WrittenAlreadyException;
 import edu.vanderbilt.phema.knime.jaxb.Config;
@@ -34,12 +36,12 @@ import edu.vanderbilt.phema.knime.jaxb.ObjectFactory;
  * @author Huan
  *
  */
-public class WorkflowLogicConnect_v2 {
+public class WorkflowConnect {
 
 	/**
 	 * 
 	 */
-	public WorkflowLogicConnect_v2() {
+	public WorkflowConnect() {
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -89,6 +91,18 @@ public class WorkflowLogicConnect_v2 {
 		nodeB.setLeftId(nodeAId);
 		
 		
+		int nodeCId = newNode();
+		TemporalRelationship nodeC = new TemporalRelationship(nodeCId, TemporalTypeCode.SBS);
+		
+		project.addKnimeNode(nodeC);
+		
+//		nodeB.setX(150);
+//		nodeB.setY(150);
+		
+		nodeB.setLeftId(nodeAId);
+		
+		
+		
 		/*
 		 *  Now I am going to set up a connection
 		 * */
@@ -100,6 +114,13 @@ public class WorkflowLogicConnect_v2 {
 		connA.setSource(nodeAId, 1);
 		connA.setDest(nodeBId, 1);
 //		connA.addBendpoint(100, 100);
+		
+		int connBId = newConnection();
+		Connection connB = new Connection(connBId);
+		project.addKnimeConnection(connB);
+		connB.setSource(nodeAId, 1);
+		connB.setDest(nodeCId, 1);
+
 		
 		project.buildProject();
 		

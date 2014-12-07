@@ -3,15 +3,16 @@
  */
 package edu.vanderbilt.phema.QdmKnime;
 
-import java.awt.Point;
+//import java.awt.Point;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
+//import java.io.PrintWriter;
+//import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 
@@ -20,9 +21,9 @@ import net.lingala.zip4j.exception.ZipException;
 import edu.vanderbilt.phema.QdmKnimeInterfaces.LogicalRelationshipInterface;
 import edu.vanderbilt.phema.knime.exceptions.SetUpIncompleteException;
 import edu.vanderbilt.phema.knime.exceptions.WrittenAlreadyException;
-import edu.vanderbilt.phema.knime.jaxb.Config;
-import edu.vanderbilt.phema.knime.jaxb.EntryType;
-import edu.vanderbilt.phema.knime.jaxb.ObjectFactory;
+//import edu.vanderbilt.phema.knime.jaxb.Config;
+//import edu.vanderbilt.phema.knime.jaxb.EntryType;
+//import edu.vanderbilt.phema.knime.jaxb.ObjectFactory;
 
 /**
  * @author Huan
@@ -36,12 +37,10 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	
 	// private Path workflowRoot;  // moved to MetaNode
 	
-	private Path tempFolder;
+	private Path tempFolder = Paths.get("");
 	
-	private LogicalTypeCode logic; 
-	
-	private boolean written = false;
-	
+	private final LogicalTypeCode logic; 
+		
 	// private int id = Integer.MIN_VALUE;  // serial number of nodes, moved to MetaNode
 	
 	// private final Point nodeLocation = new Point(0, 0);  // moved to MetaNode
@@ -60,77 +59,84 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	private int leftElementNodeId  = Integer.MIN_VALUE;
 	private int rightElementNodeId = Integer.MIN_VALUE;
 	
-	private ArrayList<m_OutPort> myOutPorts;   // Not sure if it is a good design
+	private final ArrayList<m_OutPort> myOutPorts;   // Not sure if it is a good design
 	
 	private String folderName;   // end folder name for the node "AND (#3)", defined in method write
 	
 	private Path sourceFolder = Paths.get("resources/metaNodeRepos/logicalOperators");
 	
+	private Random randMachine = new Random();
 	
+
+	/*  // LogicalType should be set up at constructor
 	public LogicalOperator() {
 		// TODO Auto-generated constructor stub
 		super();
+		super.setX(500 + randMachine.nextInt(6) * 250);
+		super.setY(200 + randMachine.nextInt(6) * 150);
 	}
+	*/
 
 	public LogicalOperator(LogicalTypeCode typeCode){
 		super();
 		logic = typeCode;
 		myOutPorts = m_getOutPorts();
+		super.setX(300 + randMachine.nextInt(5) * 50);
+		super.setY(100 + randMachine.nextInt(5) * 25);
+		folderName = m_makeFolderName();  // #Unknown
 	}
 	
 	public LogicalOperator(int id, LogicalTypeCode typeCode){
 		super(id);
 		logic = typeCode;
 		myOutPorts = m_getOutPorts();
+		leftElementNodeId = id;
+		rightElementNodeId = id;
+		super.setX(300 + randMachine.nextInt(5) * 50);
+		super.setY(100 + randMachine.nextInt(5) * 25);
+		folderName = m_makeFolderName();
 	}
 
-	public LogicalOperator(int id){
-		super(id);
+	@Override
+	public synchronized void setId(int id){
+		super.setId(id);
+		folderName = m_makeFolderName();
+		if (leftElementNodeId == Integer.MIN_VALUE){
+			leftElementNodeId = id;
+		}
+		if (rightElementNodeId == Integer.MIN_VALUE){
+			rightElementNodeId = id;
+		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setRoot(java.lang.String)
 	 */
 	@Override
-	public void setWorkflowRoot(String dir) throws WrittenAlreadyException {
+	public synchronized void setWorkflowRoot(String dir) {
 		// TODO Auto-generated method stub
-		if (written){
-			throw new WrittenAlreadyException(super.getId());
-		} else {
-			super.setWorkflowRoot(dir);
-			tempFolder = getWorkflowRoot().resolve("temp");
-		}
-	}
 
-	/* (non-Javadoc)
-	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setId(int)
-	 */
-	@Override
-	public void setId(int id) throws WrittenAlreadyException {
-		// TODO Auto-generated method stub
-		if (written){
-			throw new WrittenAlreadyException(super.getId(), 
-					new Throwable("Attend to set Node " + super.getId() + " to " + id + " fails. "));
-		} else {
-			super.setId(id);
-		}
+		super.setWorkflowRoot(dir);
+		tempFolder = getWorkflowRoot().resolve("temp");		
 	}
-
 
 
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#write()
 	 */
 	@Override
-	public void write() throws WrittenAlreadyException,
+	public synchronized void write() throws WrittenAlreadyException,
 			SetUpIncompleteException, IOException, ZipException {
 		// TODO Auto-generated method stub
 		
+		
 		Path workflowRoot = super.getWorkflowRoot();
-		if (written) {
-			throw new WrittenAlreadyException(super.getId());
+		//folderName = m_makeFolderName();
+		Path nodeFolderPath = workflowRoot.resolve(folderName);
+		if (nodeFolderPath.toFile().exists()) {
+			throw new WrittenAlreadyException(nodeFolderPath.toString() + " exists already! ");
 		}
-		if (workflowRoot == null){
+		if (workflowRoot.getNameCount() == 0){
 			throw new SetUpIncompleteException("Workflow root is not set up for Node" + super.getId());
 		}
 		
@@ -181,12 +187,11 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 		 * Set up final target folder name, and make copy from temp
 		 * */
 		// String nodeName = getNodeName();
-		folderName = m_makeFolderName(); 
+		 
 		
 		Files.move(tempFolderForUnzip.resolve(m_getInZipFolderName()), 
-				workflowRoot.resolve(folderName), StandardCopyOption.REPLACE_EXISTING);
+				nodeFolderPath, StandardCopyOption.REPLACE_EXISTING);
 		
-		written = true;
 		
 	}
 	
@@ -194,7 +199,7 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	/*
 	 *  After unzip, the folder name
 	 * */
-	private String m_getInZipFolderName(){
+	private synchronized String m_getInZipFolderName(){
 		String name = "";
 		switch (logic) {
 			case AND: name = "AND"; break;
@@ -204,7 +209,7 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 		return name;
 	}
 	
-	private String m_getZipFileName(){
+	private synchronized String m_getZipFileName(){
 		String name = "";
 		switch (logic) {
 			case AND: name = "AND.zip"; break;
@@ -214,47 +219,12 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 		return name;
 	}
 	
-	private String m_makeFolderName(){
+	private synchronized String m_makeFolderName(){
 		String logicName = logic.name();
+		String sn = super.getId() == Integer.MIN_VALUE ? "Unknown" : String.valueOf(super.getId());
 		String fn = logicName.substring(0, Math.min(logicName.length(), 12))
-				+ " (#" + super.getId() + ")"; 
+				+ " (#" + sn + ")"; 
 		return fn;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getKnimeWorkflowConfig()
-	 */
-	@Override
-	public Config getKnimeWorkflowConfig(ObjectFactory elementFactory) throws SetUpIncompleteException {
-		// TODO Auto-generated method stub
-		/*
-		 * Example:
-		 * <config key="node_1">
-		 * <entry key="id" type="xint" value="1"/>
-		 * <entry key="node_settings_file" type="xstring" value="StartBeforeS (#1)/workflow.knime"/>
-		 * <entry key="node_is_meta" type="xboolean" value="true"/>
-		 * <entry key="node_type" type="xstring" value="MetaNode"/>
-		 * <entry key="ui_classname" type="xstring" value="org.knime.core.node.workflow.NodeUIInformation"/>
-		 * <config key="ui_settings">
-		 * <config key="extrainfo.node.bounds">
-		 * <entry key="array-size" type="xint" value="4"/>
-		 * <entry key="0" type="xint" value="391"/>
-		 * <entry key="1" type="xint" value="324"/>
-		 * <entry key="2" type="xint" value="114"/>
-		 * <entry key="3" type="xint" value="66"/>
-		 * </config>
-		 * </config>
-		 * </config>
-		 */
-		
-		
-		if (/* logic is not set up*/ myOutPorts == null ||
-			/*	super.getWorkflowRoot() == null || */  super.getId() == Integer.MIN_VALUE) {
-			throw new SetUpIncompleteException();
-		}
-		
-		return super.getKnimeWorkflowConfig(elementFactory);
-		
 	}
 
 	
@@ -262,7 +232,7 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getNumberOfInPorts()
 	 */
 	@Override
-	public int getNumberOfInPorts() {
+	public synchronized int getNumberOfInPorts() {
 		// TODO Auto-generated method stub
 		return NUM_INPORTS;
 	}
@@ -271,20 +241,17 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getNumberOfOutPorts()
 	 */
 	@Override
-	public int getNumberOfOutPorts() throws SetUpIncompleteException {
+	public synchronized int getNumberOfOutPorts() {
 		// TODO Auto-generated method stub
-		if (myOutPorts == null){
-			throw new SetUpIncompleteException("Relation type is not set up yet. ");
-		}
-
 		return myOutPorts.size();
 	}
 
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getNoteName()
+	 * Useless?
 	 */
 	@Override
-	public String getNodeName() {
+	public synchronized String getNodeName() {
 		// TODO Auto-generated method stub
 		String nodeName = "";
 		switch (logic){
@@ -305,7 +272,7 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface#setLeftId(java.lang.String)
 	 */
 	@Override
-	public void setLeftId(int element_node_id) {
+	public synchronized void setLeftId(int element_node_id) {
 		// TODO Auto-generated method stub
 		leftElementNodeId = element_node_id;
 	}
@@ -314,26 +281,17 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface#setRightId(java.lang.String)
 	 */
 	@Override
-	public void setRightId(int element_node_id) {
+	public synchronized void setRightId(int element_node_id) {
 		// TODO Auto-generated method stub
 		rightElementNodeId = element_node_id;
 	}
-
-	/* (non-Javadoc)
-	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface#setLogicalTypeCode(edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface.LogicalTypeCode)
-	 */
-	@Override
-	public void setLogicalTypeCode(LogicalTypeCode typeCode) {
-		// TODO Auto-generated method stub
-		logic = typeCode;
-		myOutPorts = m_getOutPorts();
-	}
-
+	
+	
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface#getLogicalTypeCode()
 	 */
 	@Override
-	public LogicalTypeCode getLogicalTypeCode() {
+	public synchronized LogicalTypeCode getLogicalTypeCode() {
 		// TODO Auto-generated method stub
 		return logic;
 	}
@@ -342,11 +300,8 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface#getOutputElementId(int)
 	 */
 	@Override
-	public int getOutputElementId(int port) throws IndexOutOfBoundsException, SetUpIncompleteException {
+	public synchronized int getOutputElementId(int port) throws IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
-		if (myOutPorts == null){
-			throw new SetUpIncompleteException("Relation type is not set up yet. ");
-		}
 		return myOutPorts.get(port).getElementNodeId();
 	}
 
@@ -354,15 +309,12 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.LogicalRelationshipInterface#getOutputEntityLevel(int)
 	 */
 	@Override
-	public EntityLevel getOutputEntityLevel(int port) throws IndexOutOfBoundsException, SetUpIncompleteException {
+	public synchronized EntityLevel getOutputEntityLevel(int port) throws IndexOutOfBoundsException {
 		// TODO Auto-generated method stub
-		if (myOutPorts == null){
-			throw new SetUpIncompleteException("Relation type is not set up yet. ");
-		}
 		return myOutPorts.get(port).getEventsOrPatients();
 	}
 
-	private ArrayList<m_OutPort> m_getOutPorts(){
+	private synchronized ArrayList<m_OutPort> m_getOutPorts(){
 		int currentNodeId = super.getId();
 		ArrayList<m_OutPort> outPorts = new ArrayList<m_OutPort>();
 		switch (logic) {
@@ -394,22 +346,22 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 			this.elementNodeId = elementNodeId;
 			level = eventsOrPatients;
 		}
-		public int getElementNodeId(){
+		public synchronized int getElementNodeId(){
 			return elementNodeId;
 		}
-		public EntityLevel getEventsOrPatients (){
+		public synchronized EntityLevel getEventsOrPatients (){
 			return level;
 		}
 	}
 
 	@Override
-	public String getFolderName() {
+	public synchronized String getFolderName() {
 		// TODO Auto-generated method stub
-		return folderName == null ? m_makeFolderName() : folderName;
+		return folderName;
 	}
 
 	@Override
-	public int[] getGoodOutPorts() {
+	public synchronized int[] getGoodOutPorts() {
 		// TODO Auto-generated method stub
 		
 		int[] GoodOutPorts;

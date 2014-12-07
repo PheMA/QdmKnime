@@ -5,18 +5,18 @@ public interface TemporalRelationshipInterface extends NodeInterface {
 		seconds, minutes, hours, days, weeks, months, years
 	};
 	public static enum Operator {
-		equalTo, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo
+		equalTo, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, none
 	};
 	public static enum TemporalTypeCode {
 		CONCURRENT, DURING, EAE, EAS, EBE, EBS, ECW, ECWS, EDU, OVERLAP, SAE, SAS, SBE, SBS, SCW, SCWE, SDU		
 	};
 	void setLeftId (int element_node_id);
 	void setRightId (int element_node_id);
-	void setTemporalTypeCode (TemporalTypeCode typeCode);
+	//void setTemporalTypeCode (TemporalTypeCode typeCode);
 	int getLeftId ();  // QDM data element node ID
 	int getRightId();
-	void setOperator(Operator operator);
-	void setQuantity(float quantity);
-	void setUnit(Unit unit);
+	void setOperator(Operator operator);  // <= 120 days: <=
+	void setQuantity(int quantity);    // <= 120 days: 120
+	void setUnit(Unit unit);            // <= 120 days: days
 }
 

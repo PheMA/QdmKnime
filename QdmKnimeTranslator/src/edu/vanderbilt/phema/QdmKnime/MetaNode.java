@@ -28,7 +28,7 @@ public abstract class MetaNode implements NodeInterface {
 	
 	private int id = Integer.MIN_VALUE;  // serial number of nodes
 	
-	private Path workflowRoot;
+	private Path workflowRoot = Paths.get("");
 	
 	private final Point nodeLocation = new Point(0, 0);
 	
@@ -48,12 +48,12 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setRoot(java.lang.String)
 	 */
 	@Override
-	public void setWorkflowRoot(String dir) throws WrittenAlreadyException {
+	public synchronized void setWorkflowRoot(String dir) {
 		// TODO Auto-generated method stub
 		workflowRoot = Paths.get(dir);
 	}
 	
-	public Path getWorkflowRoot() {
+	public synchronized Path getWorkflowRoot() {
 		return workflowRoot;
 	}
 
@@ -61,7 +61,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setId(int)
 	 */
 	@Override
-	public void setId(int id) throws WrittenAlreadyException {
+	public synchronized void setId(int id) {
 		// TODO Auto-generated method stub
 		this.id = id;
 	}
@@ -70,7 +70,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setX(int)
 	 */
 	@Override
-	public void setX(int x) {
+	public synchronized void setX(int x) {
 		// TODO Auto-generated method stub
 		nodeLocation.x = x;
 	}
@@ -79,7 +79,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setY(int)
 	 */
 	@Override
-	public void setY(int y) {
+	public synchronized void setY(int y) {
 		// TODO Auto-generated method stub
 		nodeLocation.y = y;
 	}
@@ -96,7 +96,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getKnimeWorkflowConfig()
 	 */
 	@Override
-	public Config getKnimeWorkflowConfig(ObjectFactory elementFactory) {
+	public synchronized Config getKnimeWorkflowConfig(ObjectFactory elementFactory) {
 		// TODO Auto-generated method stub
 		/*
 		 * Example:
@@ -146,7 +146,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getId()
 	 */
 	@Override
-	public int getId() {
+	public synchronized int getId() {
 		// TODO Auto-generated method stub
 		return id;
 	}
@@ -155,7 +155,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getNodeKey()
 	 */
 	@Override
-	public String getNodeKey() {
+	public synchronized String getNodeKey() {
 		// TODO Auto-generated method stub
 		return "node_" + id;
 	}
@@ -176,7 +176,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getX()
 	 */
 	@Override
-	public int getX() {
+	public synchronized int getX() {
 		// TODO Auto-generated method stub
 		return nodeLocation.x;
 	}
@@ -185,15 +185,16 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getY()
 	 */
 	@Override
-	public int getY() {
+	public synchronized int getY() {
 		// TODO Auto-generated method stub
 		return nodeLocation.y;
 	}
+	
 
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setWidth(int)
 	 */
-	public void setWidth(int width) {
+	public synchronized void setWidth(int width) {
 		// TODO Auto-generated method stub
 		nodeWidth = width;
 	}
@@ -201,7 +202,7 @@ public abstract class MetaNode implements NodeInterface {
 	/* (non-Javadoc)
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#setHeight(int)
 	 */
-	public void setHeight(int height) {
+	public synchronized void setHeight(int height) {
 		// TODO Auto-generated method stub
 		nodeHeight = height;
 	}
@@ -210,7 +211,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getWidth()
 	 */
 	@Override
-	public int getWidth() {
+	public synchronized int getWidth() {
 		// TODO Auto-generated method stub
 		return nodeWidth;
 	}
@@ -219,7 +220,7 @@ public abstract class MetaNode implements NodeInterface {
 	 * @see edu.vanderbilt.mc.phema.QdmKnimeInterfaces.NodeInterface#getHeight()
 	 */
 	@Override
-	public int getHeight() {
+	public synchronized int getHeight() {
 		// TODO Auto-generated method stub
 		return nodeHeight;
 	}

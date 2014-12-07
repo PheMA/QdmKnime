@@ -11,8 +11,8 @@ import edu.vanderbilt.phema.knime.jaxb.ObjectFactory;
 
 public interface NodeInterface {
 	
-	void setWorkflowRoot(String dir) throws WrittenAlreadyException;
-	void setId(int id) throws WrittenAlreadyException;  // serial number of nodes
+	void setWorkflowRoot(String dir);
+	void setId(int id);  // serial number of nodes
 	void setX(int x);
 	void setY(int y);
 //	void setWidth(int width);
@@ -21,7 +21,7 @@ public interface NodeInterface {
 	void write() throws WrittenAlreadyException, SetUpIncompleteException, IOException, ZipException;    // Execution, write files. Final step. After this step, the object should be write only
 //	String getPmml();  // The PMML segment for KNIME work flow
 
-	Config getKnimeWorkflowConfig(ObjectFactory elementFactory) throws SetUpIncompleteException;
+	Config getKnimeWorkflowConfig(ObjectFactory elementFactory);
 	
 //	boolean isReadOnly();   // after write(), the node should be read only
 	int getId();
