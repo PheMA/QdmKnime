@@ -249,7 +249,7 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 		
 		
 		if (/* logic is not set up*/ myOutPorts == null ||
-				super.getWorkflowRoot() == null || super.getId() == Integer.MIN_VALUE) {
+			/*	super.getWorkflowRoot() == null || */  super.getId() == Integer.MIN_VALUE) {
 			throw new SetUpIncompleteException();
 		}
 		
