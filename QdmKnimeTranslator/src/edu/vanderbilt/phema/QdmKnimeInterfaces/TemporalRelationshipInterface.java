@@ -15,6 +15,10 @@ public interface TemporalRelationshipInterface extends NodeInterface {
 	//void setTemporalTypeCode (TemporalTypeCode typeCode);
 	int getLeftId ();  // QDM data element node ID
 	int getRightId();
+	TemporalTypeCode getTemporalType();
+	Operator getOperator();
+	int getQuantity();
+	Unit getUnit();
 	void setOperator(Operator operator);  // <= 120 days: <=
 	void setQuantity(int quantity);    // <= 120 days: 120
 	void setUnit(Unit unit);            // <= 120 days: days

@@ -4,6 +4,8 @@
 package edu.vanderbilt.phema.QdmKnime;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -136,6 +138,7 @@ public class TemporalRelationship extends MetaNode implements
 	@Override
 	public synchronized void setOperator(Operator operator) {
 		// TODO Auto-generated method stub
+		// #${setOperator}$#
 		this.operator = operator;
 	}
 
@@ -198,42 +201,113 @@ public class TemporalRelationship extends MetaNode implements
 		ZipFile zipFile = new ZipFile(tempZipPath.toString());
 		zipFile.extractAll(tempFolderForUnzip.toString());
 		
-		/*
-		 *  Set up $%{customDescription}%$
-		 *  no use actually
-		 * 
-		
-		Path workflowTemplate = tempFolderForUnzip.resolve(m_getInZipFolderName()).resolve("workflow.knime.template");
-		Path workflowInTemp = tempFolderForUnzip.resolve(m_getInZipFolderName()).resolve("workflow.knime");
-		
-		String workflowTemplateContent = Toolkit.readFile(
-				workflowTemplate.toString(), 
-				Charset.defaultCharset());
-		
-		String workflowOutContent = workflowTemplateContent.replace(
-				"$%{customDescription}%$", 
-				customDescription.isEmpty() ? getNodeName() : customDescription);
-		
-		PrintWriter outStream = new PrintWriter(workflowInTemp.toFile());
-		
-		outStream.print(workflowOutContent);
-		
-		outStream.close();
-		
-		workflowTemplate.toFile().delete();
-		*/
-		
-		/*
-		 * Set up final target folder name, and make copy from temp
-		 * */
-		// String nodeName = getNodeName();
-		 
+				 
+		if (haveGoodOperations()){
+			
+			/*
+			 * Set up Operator (<= 120 days: <=)
+			 * */
+			
+			Path operatorTemplate = tempFolderForUnzip.resolve( /* Node Folder resource name */ temporalType.name()
+					).resolve(getOperatorSettingNodeFolder()).resolve("settings.xml.template");
+			Path operatorSettings = tempFolderForUnzip.resolve( /* Node Folder resource name */ temporalType.name()
+					).resolve(getOperatorSettingNodeFolder()).resolve("settings.xml");
+			operatorSettings.toFile().delete();
+			
+			String operatorTemplateContent = Toolkit.readFile(
+					operatorTemplate.toString(), 
+					Charset.defaultCharset());
+			String operatorSettingsContent = operatorTemplateContent.replace(
+					"#${setOperator}$#", getOperatorString());
+			
+			PrintWriter outStream = new PrintWriter(operatorSettings.toFile());
+			
+			outStream.print(operatorSettingsContent);
+			outStream.close();
+			
+			/*
+			 * Need to implement quantity and unit: 120 days
+			 * 
+			 * #${quantity}$#
+			 * 
+			 * #${unit}$#
+			 * 
+			 * */
+			
+			Path timeShiftingTemplate = tempFolderForUnzip.resolve( /* Node Folder resource name */ temporalType.name()
+					).resolve(getTimeShiftingSettingNodeFolder()).resolve("settings.xml.template");
+			Path timeShiftingSettings = tempFolderForUnzip.resolve( /* Node Folder resource name */ temporalType.name()
+					).resolve(getTimeShiftingSettingNodeFolder()).resolve("settings.xml");
+			timeShiftingSettings.toFile().delete();
+			
+			String timeShiftingTemplateContent = Toolkit.readFile(
+					timeShiftingTemplate.toString(), 
+					Charset.defaultCharset());
+			String timeShiftingSettingsContent = timeShiftingTemplateContent
+					.replace("#${quantity}$#", String.valueOf(getQuantity()))
+					.replace("#${unit}$#", getShiftingUnitKnime());
+			
+			PrintWriter outStream2 = new PrintWriter(timeShiftingSettings.toFile());
+			outStream2.print(timeShiftingSettingsContent);
+			outStream2.close();
+			
+			
+		}
 		
 		Files.move(tempFolderForUnzip.resolve(temporalType.name()), 
 				nodeFolderPath, StandardCopyOption.REPLACE_EXISTING);
-		
-
-
+	}
+	
+	private String getShiftingUnitKnime(){
+		String re = "Day";
+		switch (unit){
+		case days: re = "Day"; break;
+		case hours: re = "Hour"; break;
+		case minutes: re = "Minute"; break;
+		case months: re = "Month"; break;
+		case seconds: re = "Second"; break;
+		case weeks: re = "Week"; break;
+		case years: re = "Year"; break;
+		}
+		return re;
+	}
+	
+	private String getOperatorString() {
+		String re = " Wrong ";
+		switch(operator){
+		case equalTo: re = " = "; break;
+		case greaterThan: re = " &gt; "; break;
+		case greaterThanOrEqualTo: re = " &gt;= "; break;
+		case lessThan: re = " &lt; "; break;
+		case lessThanOrEqualTo: re = " &lt;= "; break;
+		case none: break;
+		}
+		return re; 
+	}
+	
+	private boolean haveGoodOperations(){
+		return 	operator != Operator.none && 
+				quantity != 0 && ( 
+				temporalType == TemporalTypeCode.EAE ||
+				temporalType == TemporalTypeCode.EAS ||
+				temporalType == TemporalTypeCode.EBE ||
+				temporalType == TemporalTypeCode.EBS ||
+				temporalType == TemporalTypeCode.SAE ||
+				temporalType == TemporalTypeCode.SAS ||
+				temporalType == TemporalTypeCode.SBE ||
+				temporalType == TemporalTypeCode.SBS);	
+	}
+	
+	private String getOperatorSettingNodeFolder(){
+		// The folder names happen to be all the same for all temporal types
+		String re = "Rule_based Row Filter (#55)";
+		return re;
+	}
+	
+	private String getTimeShiftingSettingNodeFolder(){
+		// The folder names happen to be all the same for all temporal types
+		String re = "Date_Time Shift  (#60)";
+		return re;
 	}
 	
 	/* (non-Javadoc)
@@ -318,6 +392,30 @@ public class TemporalRelationship extends MetaNode implements
 		String fn = temperalName.substring(0, Math.min(temperalName.length(), 12))
 				+ " (#" + sn + ")"; 
 		return fn;
+	}
+
+	@Override
+	public TemporalTypeCode getTemporalType() {
+		// TODO Auto-generated method stub
+		return temporalType;
+	}
+
+	@Override
+	public Operator getOperator() {
+		// TODO Auto-generated method stub
+		return operator;
+	}
+
+	@Override
+	public int getQuantity() {
+		// TODO Auto-generated method stub
+		return quantity;
+	}
+
+	@Override
+	public Unit getUnit() {
+		// TODO Auto-generated method stub
+		return unit;
 	}
 
 
