@@ -10,6 +10,9 @@ import java.nio.file.Paths;
 import javax.xml.bind.JAXBException;
 
 import net.lingala.zip4j.exception.ZipException;
+
+import org.junit.Test;
+
 import edu.phema.QdmKnime.Connection;
 import edu.phema.QdmKnime.KnimeProject;
 import edu.phema.QdmKnime.LogicalOperator;
@@ -27,26 +30,19 @@ import edu.phema.knime.exceptions.WrittenAlreadyException;
  */
 public class WorkflowTest {
 
-	/**
-	 * 
-	 */
-	public WorkflowTest() {
-		// TODO Auto-generated constructor stub
+	int currentNodeId = 0;
+	int currentConnectionId = 0;
+	
+	private int newNode(){
+		return currentNodeId++;
 	}
 	
-	static int currentNodeId = 0;
-	static int currentConnectionId = 0;
+	private int newConnection(){
+		return currentConnectionId++;
+	}
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 * @throws ZipException 
-	 * @throws SetUpIncompleteException 
-	 * @throws WrittenAlreadyException 
-	 * @throws JAXBException 
-	 */
-	public static void main(String[] args) throws IOException, WrittenAlreadyException, SetUpIncompleteException, ZipException, JAXBException {
-		// TODO Auto-generated method stub
+	@Test
+	public void smokeTest() throws IOException, WrittenAlreadyException, SetUpIncompleteException, ZipException, JAXBException {
 		Path testPath = Paths.get(System.getProperty("java.io.tmpdir")).resolve("qdmKnime");
 		testPath.toFile().mkdirs();
 
@@ -119,13 +115,4 @@ public class WorkflowTest {
 		System.out.println(project.getProjectDir().toString());
 		
 	}
-	
-	static int newNode(){
-		return currentNodeId ++;
-	}
-	
-	static int newConnection(){
-		return currentConnectionId ++;
-	}
-
 }
