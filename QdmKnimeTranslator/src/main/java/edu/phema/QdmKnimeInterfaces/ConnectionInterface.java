@@ -2,8 +2,8 @@ package edu.phema.QdmKnimeInterfaces;
 
 import java.awt.Point;
 
-import edu.phema.knime.jaxb.Config;
-import edu.phema.knime.jaxb.ObjectFactory;
+import edu.phema.jaxb.knime.Config;
+import edu.phema.jaxb.knime.ObjectFactory;
 
 public interface ConnectionInterface {
 	void setId (int id);

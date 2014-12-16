@@ -3,10 +3,10 @@ package edu.phema.QdmKnimeInterfaces;
 import java.io.IOException;
 
 import net.lingala.zip4j.exception.ZipException;
+import edu.phema.jaxb.knime.Config;
+import edu.phema.jaxb.knime.ObjectFactory;
 import edu.phema.knime.exceptions.SetUpIncompleteException;
 import edu.phema.knime.exceptions.WrittenAlreadyException;
-import edu.phema.knime.jaxb.Config;
-import edu.phema.knime.jaxb.ObjectFactory;
 
 
 public interface NodeInterface {

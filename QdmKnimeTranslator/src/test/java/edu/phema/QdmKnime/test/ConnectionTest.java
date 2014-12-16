@@ -13,10 +13,11 @@ import javax.xml.bind.Marshaller;
 //import javax.xml.bind.util.JAXBSource;
 //import javax.xml.namespace.QName;
 
+
 import org.junit.Test;
 
 import edu.phema.QdmKnime.Connection;
-import edu.phema.knime.jaxb.ObjectFactory;
+import edu.phema.jaxb.knime.ObjectFactory;
 
 /**
  * @author Huan

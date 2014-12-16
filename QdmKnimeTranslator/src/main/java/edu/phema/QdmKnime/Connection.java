@@ -7,10 +7,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import edu.phema.QdmKnimeInterfaces.ConnectionInterface;
-import edu.phema.knime.jaxb.Config;
-import edu.phema.knime.jaxb.Entry;
-import edu.phema.knime.jaxb.EntryType;
-import edu.phema.knime.jaxb.ObjectFactory;
+import edu.phema.jaxb.knime.Config;
+import edu.phema.jaxb.knime.Entry;
+import edu.phema.jaxb.knime.EntryType;
+import edu.phema.jaxb.knime.ObjectFactory;
 
 /**
  * @author Huan
