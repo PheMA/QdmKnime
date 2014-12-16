@@ -19,10 +19,10 @@ import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 import edu.phema.QdmKnimeInterfaces.ConnectionInterface;
 import edu.phema.QdmKnimeInterfaces.NodeInterface;
+import edu.phema.jaxb.knime.Config;
+import edu.phema.jaxb.knime.ObjectFactory;
 import edu.phema.knime.exceptions.SetUpIncompleteException;
 import edu.phema.knime.exceptions.WrittenAlreadyException;
-import edu.phema.knime.jaxb.Config;
-import edu.phema.knime.jaxb.ObjectFactory;
 
 /**
  * @author Huan
