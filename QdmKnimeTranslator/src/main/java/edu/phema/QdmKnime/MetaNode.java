@@ -26,11 +26,13 @@ public abstract class MetaNode implements NodeInterface {
 	 * 
 	 */
 	
-	private int id = Integer.MIN_VALUE;  // serial number of nodes
+	public final int UNKNOWN_ID = Integer.MIN_VALUE;
 	
+	private int id = UNKNOWN_ID;  // serial number of nodes
+		
 	private Path workflowRoot = Paths.get("");
 	
-	private final Point nodeLocation = new Point(0, 0);
+	private final Point nodeLocation = new Point(10, 10);
 	
 	private int nodeWidth = 130;
 	

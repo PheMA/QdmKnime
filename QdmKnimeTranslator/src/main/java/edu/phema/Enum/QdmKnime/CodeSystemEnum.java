@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.phema.QdmKnime;
+package edu.phema.Enum.QdmKnime;
 
 /**
  * @author moh

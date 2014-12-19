@@ -16,6 +16,7 @@ import org.junit.Test;
 import edu.phema.QdmKnime.Connection;
 import edu.phema.QdmKnime.KnimeProject;
 import edu.phema.QdmKnime.LogicalOperator;
+import edu.phema.QdmKnime.QdmDataElement;
 import edu.phema.QdmKnime.TemporalRelationship;
 import edu.phema.QdmKnimeInterfaces.LogicalRelationshipInterface.LogicalTypeCode;
 import edu.phema.QdmKnimeInterfaces.TemporalRelationshipInterface.Operator;
@@ -89,6 +90,14 @@ public class WorkflowTest {
 		
 		nodeB.setLeftId(nodeAId);
 		
+		int nodeDId = newNode();
+		QdmDataElement nodeD = new QdmDataElement(nodeDId);
+		nodeD.setQdmDataType("Diagnosis Active");
+		nodeD.setX(100);
+		nodeD.setY(100);
+		// Need to add configurations
+		
+		project.addKnimeNode(nodeD);
 		
 		
 		/*
@@ -109,6 +118,11 @@ public class WorkflowTest {
 		connB.setSource(nodeAId, 1);
 		connB.setDest(nodeCId, 1);
 
+		int connCId = newConnection();
+		Connection connC = new Connection(connCId);
+		project.addKnimeConnection(connC);
+		connC.setSource(nodeDId, 0);
+		connC.setDest(connAId, 0);
 		
 		project.buildProject();
 		

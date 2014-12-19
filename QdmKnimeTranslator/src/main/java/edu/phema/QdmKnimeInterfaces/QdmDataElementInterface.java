@@ -4,8 +4,9 @@
 package edu.phema.QdmKnimeInterfaces;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 
-import edu.phema.QdmKnime.CodeSystemEnum;
+import edu.phema.Enum.QdmKnime.CodeSystemEnum;
 import edu.phema.jaxb.ihe.svs.CD;
 import edu.phema.jaxb.ihe.svs.ConceptListType;
 import edu.phema.jaxb.ihe.svs.RetrieveValueSetResponseType;
@@ -22,9 +23,9 @@ public interface QdmDataElementInterface extends NodeInterface {
 	String getQdmDataType();
 	
 	
-	void addValueSet(String vsacXml);
-	void addValueSet(JAXBElement<RetrieveValueSetResponseType> vsacXmlJaxb);
-	void addValueSet(ConceptListType conceptList);
+	void setValueSet(String vsacXml) throws JAXBException;
+	void setValueSet(JAXBElement<RetrieveValueSetResponseType> vsacXmlJaxb);
+	void addValues(ConceptListType conceptList);
 	
 	void addValue(CD code);
 	
@@ -43,7 +44,8 @@ public interface QdmDataElementInterface extends NodeInterface {
 	String[] getCodeDisplayNames();
 	String[] getCodeDisplayNames(CodeSystemEnum codeSystem);
 	
-	void addVariableForSQL(String name, String Variable);
+	void setVariableForSQL(String name, String Variable);
+	String[] getVariableNamesForSQL();
 	void addQdmAttributes(
 			String requiredColumn, String dataType, String explanation);
 	

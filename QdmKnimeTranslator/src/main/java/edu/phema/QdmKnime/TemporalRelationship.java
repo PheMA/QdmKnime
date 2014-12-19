@@ -388,7 +388,7 @@ public class TemporalRelationship extends MetaNode implements
 	
 	private synchronized String m_makeFolderName(){
 		String temperalName = temporalType.name();
-		String sn = super.getId() == Integer.MIN_VALUE ? "Unknown" : String.valueOf(super.getId());
+		String sn = super.getId() == super.UNKNOWN_ID ? "Unknown" : String.valueOf(super.getId());
 		String fn = temperalName.substring(0, Math.min(temperalName.length(), 12))
 				+ " (#" + sn + ")"; 
 		return fn;

@@ -218,7 +218,7 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 	
 	private synchronized String m_makeFolderName(){
 		String logicName = logic.name();
-		String sn = super.getId() == Integer.MIN_VALUE ? "Unknown" : String.valueOf(super.getId());
+		String sn = super.getId() == super.UNKNOWN_ID ? "Unknown" : String.valueOf(super.getId());
 		String fn = logicName.substring(0, Math.min(logicName.length(), 12))
 				+ " (#" + sn + ")"; 
 		return fn;
