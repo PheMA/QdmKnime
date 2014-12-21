@@ -4,8 +4,10 @@
 package edu.phema.QdmKnime;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -33,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import edu.phema.Enum.QdmKnime.CodeSystemEnum;
+import edu.phema.Enum.QdmKnime.CreateTableColumnClassEnum;
 import edu.phema.QdmKnimeInterfaces.QdmDataElementInterface;
 import edu.phema.jaxb.ihe.svs.CD;
 import edu.phema.jaxb.ihe.svs.ConceptListType;
@@ -41,6 +45,7 @@ import edu.phema.jaxb.ihe.svs.RetrieveValueSetResponseType;
 import edu.phema.jaxb.ihe.svs.ValueSetResponseType;
 import edu.phema.knime.exceptions.SetUpIncompleteException;
 import edu.phema.knime.exceptions.WrittenAlreadyException;
+import edu.phema.knime.nodeSettings.TableCreator;
 
 /**
  * @author moh
@@ -444,14 +449,91 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 		
 		/*
 		 * Need to implement settings
-		 * 1. put value sets
-		 * 2. put variables for SQL
+		 * 1. put value sets (Done)
+		 * 2. put variables for SQL (Done)
 		 * 3. put required attributes
 		 * 4. put texts
 		 * 
 		 * */
+		if (valueSet.size() > 0){
+			try {
+				TableCreator tb = new TableCreator();
+				tb.setColumnProperties(0, "code", CreateTableColumnClassEnum.String);
+				tb.setColumnProperties(1, "codeSystem", CreateTableColumnClassEnum.String);
+				tb.setColumnProperties(2, "codeSystemName", CreateTableColumnClassEnum.String);
+				tb.setColumnProperties(3, "codeSystemVersion", CreateTableColumnClassEnum.String);
+				tb.setColumnProperties(4, "displayName", CreateTableColumnClassEnum.String);
+				for (int i = 0; i < valueSet.size(); i++){
+					CD cd = valueSet.get(i);
+					tb.setCell(cd.getCode(), i, 0);
+					tb.setCell(cd.getCodeSystem(), i, 1);
+					tb.setCell(cd.getCodeSystemName(), i, 2);
+					tb.setCell(cd.getCodeSystemVersion(), i, 3);
+					tb.setCell(cd.getDisplayName(), i, 4);
+				}
+				tb.setNodeAnnotationText(valueSetDisplayName);
+				String newSettings = tb.getSettings();
+				Path settingsXml = tempFolderForUnzip
+						.resolve("DATA_ELEMENT/Table Creator (#7)/settings.xml");
+				Files.move(settingsXml, 
+						tempFolderForUnzip.resolve("DATA_ELEMENT/Table Creator (#7)/settings.old.xml"), 
+						StandardCopyOption.REPLACE_EXISTING);
+				PrintWriter outStream = new PrintWriter(settingsXml.toFile());
+				outStream.print(newSettings);
+				outStream.close();
+
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if (variablesForSQL.size() > 0){
+			try {
+				TableCreator tb = new TableCreator();
+				ArrayList<String> variableNames = 
+						new ArrayList<String>(variablesForSQL.keySet());
+				for (int i = 0; i < variableNames.size(); i ++){
+					tb.setColumnProperties(i, variableNames.get(i), 
+							CreateTableColumnClassEnum.String);
+					tb.setCell(variablesForSQL.get(variableNames.get(i)), 0, i);
+				}
+				tb.setNodeAnnotationText("Value set Tools%%00010for SQL");
+				String newSettings = tb.getSettings();
+				Path settingsXml = tempFolderForUnzip
+						.resolve("DATA_ELEMENT/Table Creator (#11)/settings.xml");
+				Files.move(settingsXml, 
+						tempFolderForUnzip.resolve("DATA_ELEMENT/Table Creator (#11)/settings.old.xml"), 
+						StandardCopyOption.REPLACE_EXISTING);
+				PrintWriter outStream = new PrintWriter(settingsXml.toFile());
+				outStream.print(newSettings);
+				outStream.close();
+				
+			} catch (JAXBException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 		
 		
+		if (! qdmText.equals("")){
+			Path workflowDir = tempFolderForUnzip
+					.resolve("DATA_ELEMENT");
+			Files.move(workflowDir.resolve("workflow.knime"), workflowDir.resolve("workflow.knime.old"), 
+					StandardCopyOption.REPLACE_EXISTING);
+			String templateString = Toolkit.readFile(
+					workflowDir.resolve("workflow.knime.template").toString(), 
+					Charset.defaultCharset());
+			String newWorkflowString = templateString.replace("#${qdmDescText}$#", 
+					qdmText);
+			
+			PrintWriter outStream = new PrintWriter(workflowDir
+					.resolve("workflow.knime").toFile());
+			
+			outStream.print(newWorkflowString);
+			outStream.close();
+		}
 		
 		
 		Files.move(tempFolderForUnzip.resolve("DATA_ELEMENT"), 

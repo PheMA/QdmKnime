@@ -4,6 +4,7 @@
 package edu.phema.QdmKnime.test;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -18,6 +19,7 @@ import edu.phema.QdmKnime.KnimeProject;
 import edu.phema.QdmKnime.LogicalOperator;
 import edu.phema.QdmKnime.QdmDataElement;
 import edu.phema.QdmKnime.TemporalRelationship;
+import edu.phema.QdmKnime.Toolkit;
 import edu.phema.QdmKnimeInterfaces.LogicalRelationshipInterface.LogicalTypeCode;
 import edu.phema.QdmKnimeInterfaces.TemporalRelationshipInterface.Operator;
 import edu.phema.QdmKnimeInterfaces.TemporalRelationshipInterface.TemporalTypeCode;
@@ -95,6 +97,9 @@ public class WorkflowTest {
 		nodeD.setQdmDataType("Diagnosis Active");
 		nodeD.setX(100);
 		nodeD.setY(100);
+		nodeD.setValueSet(Toolkit.readFile("src/test/resources/valueSet_infection.xml", 
+				Charset.defaultCharset()));
+		nodeD.setQdmDataElementText("Text Description from QDM");
 		// Need to add configurations
 		
 		project.addKnimeNode(nodeD);
