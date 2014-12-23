@@ -100,6 +100,13 @@ public class WorkflowTest {
 		nodeD.setValueSet(Toolkit.readFile("src/test/resources/valueSet_infection.xml", 
 				Charset.defaultCharset()));
 		nodeD.setQdmDataElementText("Text Description from QDM");
+		nodeD.addQdmAttributes("startDatetime", 
+				"DateAndTimeCell", 
+				"Start/admitting date (time). Please make sure data type is correct");
+		nodeD.addQdmAttributes("stopDatetime", 
+				"DateAndTimeCell", 
+				"Stop/discharging date (time). Please make sure data type is correct");
+		
 		// Need to add configurations
 		
 		project.addKnimeNode(nodeD);

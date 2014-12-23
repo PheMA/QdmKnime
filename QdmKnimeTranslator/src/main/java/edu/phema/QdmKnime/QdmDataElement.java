@@ -65,8 +65,14 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 	private String valueSetVersion = "";
 	private final HashMap<String, String> variablesForSQL = new HashMap<String, String>();
 	
+	private final TableCreator requiredAttributes;
+	private int attributeTableRowCount = 0;
+	
 	public QdmDataElement() {
 		// TODO Auto-generated constructor stub
+		
+		requiredAttributes = initializeAttributesTable();
+		attributeTableRowCount = 2;
 	}
 
 	/**
@@ -75,8 +81,36 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 	public QdmDataElement(int id) {
 		super(id);
 		// TODO Auto-generated constructor stub
+		requiredAttributes = initializeAttributesTable();
+		attributeTableRowCount = 2;
 	}
 
+	private static TableCreator initializeAttributesTable(){
+		TableCreator attributeTable = null;
+		try {
+			attributeTable = new TableCreator();
+			attributeTable.setNodeAnnotationText(
+					"Instruction: %%00010required output columns");
+			attributeTable.setColumnProperties(0, 
+					"requiredColumn", CreateTableColumnClassEnum.String);
+			attributeTable.setColumnProperties(1, 
+					"dataType", CreateTableColumnClassEnum.String);
+			attributeTable.setColumnProperties(2, 
+					"explanation", CreateTableColumnClassEnum.String);
+			attributeTable.setCell("eventId", 0, 0);
+			attributeTable.setCell("StringCell", 0, 1);
+			attributeTable.setCell("Event Id", 0, 2);
+			attributeTable.setCell("pid", 1, 0);
+			attributeTable.setCell("StringCell", 1, 1);
+			attributeTable.setCell("Patient Id", 1, 2);
+
+		} catch (JAXBException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return attributeTable;
+	}
+	
 	/* (non-Javadoc)
 	 * @see edu.phema.QdmKnimeInterfaces.QdmDataElementInterface#setQdmDataElementText(java.lang.String)
 	 * Descriptive text from HQMF
@@ -403,6 +437,15 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 	public void addQdmAttributes(String requiredColumn, String dataType,
 			String explanation) {
 		// TODO Auto-generated method stub
+		if (requiredAttributes != null){
+			requiredAttributes.setCell(requiredColumn, 
+					attributeTableRowCount, 0);
+			requiredAttributes.setCell(dataType, 
+					attributeTableRowCount, 1);
+			requiredAttributes.setCell(explanation, 
+					attributeTableRowCount, 2);
+		}
+		attributeTableRowCount ++;
 
 	}
 
@@ -516,6 +559,16 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 			
 		}
 		
+		if (requiredAttributes != null) {
+			Path settingsXml = tempFolderForUnzip
+					.resolve("DATA_ELEMENT/Table Creator (#1)/settings.xml");
+			Files.move(settingsXml, 
+					tempFolderForUnzip.resolve("DATA_ELEMENT/Table Creator (#1)/settings.old.xml"), 
+					StandardCopyOption.REPLACE_EXISTING);
+			PrintWriter outStream = new PrintWriter(settingsXml.toFile());
+			outStream.print(requiredAttributes.getSettings());
+			outStream.close();
+		}
 		
 		if (! qdmText.equals("")){
 			Path workflowDir = tempFolderForUnzip
@@ -534,6 +587,7 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 			outStream.print(newWorkflowString);
 			outStream.close();
 		}
+		
 		
 		
 		Files.move(tempFolderForUnzip.resolve("DATA_ELEMENT"), 
