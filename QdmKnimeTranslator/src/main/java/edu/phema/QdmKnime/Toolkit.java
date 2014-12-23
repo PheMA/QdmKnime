@@ -67,6 +67,10 @@ public class Toolkit {
 			  return new String(encoded, encoding);
 	}
 	
+	public static String readFile(String path) throws IOException {
+		return readFile(path, Charset.defaultCharset());
+	}
+	
 	public static void addWorkflowOverHeads(Config inConfig, ObjectFactory factory){
 		/*
 		 * <entry key="created_by" type="xstring" value="2.10.2.0044326"/>
