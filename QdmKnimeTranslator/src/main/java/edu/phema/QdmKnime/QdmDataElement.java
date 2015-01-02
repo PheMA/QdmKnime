@@ -28,11 +28,15 @@ import javax.xml.bind.JAXBException;
 
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
+import javax.xml.rpc.ServiceException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 
+import BeanService.RxConcept;
+import BeanService.RxConceptGroup;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import edu.phema.Enum.QdmKnime.CodeSystemEnum;
@@ -46,6 +50,7 @@ import edu.phema.jaxb.ihe.svs.ValueSetResponseType;
 import edu.phema.knime.exceptions.SetUpIncompleteException;
 import edu.phema.knime.exceptions.WrittenAlreadyException;
 import edu.phema.knime.nodeSettings.TableCreator;
+import gov.nih.nlm.mor.axis.services.RxNormDBService.DBManager;
 
 /**
  * @author moh
@@ -67,12 +72,14 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 	
 	private final TableCreator requiredAttributes;
 	private int attributeTableRowCount = 0;
+	private final DBManager rxnormManager; 
 	
 	public QdmDataElement() {
 		// TODO Auto-generated constructor stub
 		
 		requiredAttributes = initializeAttributesTable();
 		attributeTableRowCount = 2;
+		rxnormManager = Toolkit.getRxnormManager();
 	}
 
 	/**
@@ -83,8 +90,9 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 		// TODO Auto-generated constructor stub
 		requiredAttributes = initializeAttributesTable();
 		attributeTableRowCount = 2;
+		rxnormManager = Toolkit.getRxnormManager();
 	}
-
+	
 	private static TableCreator initializeAttributesTable(){
 		TableCreator attributeTable = null;
 		try {
@@ -367,6 +375,16 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 		variablesForSQL.put(name, variable);
 	}
 	
+	public void addVariableForSQL(String name, String variable) {
+		// TODO Auto-generated method stub
+		String newName = name;
+		while (variablesForSQL.containsKey(newName) & newName.length() <= 32){
+			newName = newName + "_1";
+		}
+		variablesForSQL.put(newName, variable);
+	}
+
+	
 	public void updateVariablesForSQL(){
 		String inClause = "";
 		String inClauseI2b2 = "";
@@ -498,6 +516,8 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 		 * 4. put texts
 		 * 
 		 * */
+		ArrayList<String> rxnormRegExUnits = new ArrayList<String>();
+		
 		if (valueSet.size() > 0){
 			try {
 				TableCreator tb = new TableCreator();
@@ -513,6 +533,43 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 					tb.setCell(cd.getCodeSystemName(), i, 2);
 					tb.setCell(cd.getCodeSystemVersion(), i, 3);
 					tb.setCell(cd.getDisplayName(), i, 4);
+					
+					
+					if (cd.getCodeSystemName().equals("RXNORM") | cd.getCodeSystem().equals("2.16.840.1.113883.6.88")){
+						String[] types = {"IN", "BN"};
+						RxConceptGroup[] rxConceptGroups = rxnormManager
+								.getRelatedByType(cd.getCode(),  types);
+						for (RxConceptGroup conceptGroup : rxConceptGroups){
+							RxConcept[] concepts = conceptGroup.getRxConcept();
+							ArrayList<String> strs = new ArrayList<String>();
+							for (RxConcept concept : concepts){
+								strs.add(concept.getSTR());		
+							}
+							if (strs.size() == 1) {
+								rxnormRegExUnits.add(strs.get(0));
+							} else if (conceptGroup.getType().equals("BN")) {
+								rxnormRegExUnits.addAll(strs);
+							} else {
+								for (int j = 0; j < strs.size(); j ++){
+									for (int k = 0; k < strs.size(); k ++){
+										if (j != k){
+											rxnormRegExUnits.add(
+													strs.get(j) + 
+													".{1,10}" +
+													strs.get(k));
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (rxnormRegExUnits.size() > 0){
+					this.addVariableForSQL("REGEX_RXNORM", 
+							StringUtils.join(
+									rxnormRegExUnits.toArray(
+											new String[rxnormRegExUnits.size()]), 
+											'|'));
 				}
 				tb.setNodeAnnotationText(valueSetDisplayName);
 				String newSettings = tb.getSettings();

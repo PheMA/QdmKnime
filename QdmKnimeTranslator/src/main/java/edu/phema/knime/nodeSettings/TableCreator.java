@@ -219,7 +219,7 @@ public class TableCreator {
 		columnConfig.getEntryOrConfig().add(Toolkit.makeEntry("ReadPossValsFromFile", 
 				EntryType.XBOOLEAN, "false", objectFactory));
 		columnConfig.getEntryOrConfig().add(Toolkit.makeEntry("SkipThisColumn", 
-				EntryType.XBOOLEAN, "true", objectFactory));
+				EntryType.XBOOLEAN, "false", objectFactory));
 		
 		Entry columnNameEntry = Toolkit.makeEntry("ColumnName", 
 				EntryType.XSTRING, columnName, objectFactory);

@@ -59,7 +59,7 @@ public class VsacConnector {
 	
 	}
 	
-	VsacConnector (String account, String passcode) throws ConnectException{
+	public VsacConnector (String account, String passcode) throws ConnectException{
 		this.account = account;
 		this.passcode = passcode;
 		renewTgt();

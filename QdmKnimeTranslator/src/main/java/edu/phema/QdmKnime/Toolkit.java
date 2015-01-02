@@ -4,16 +4,23 @@
 package edu.phema.QdmKnime;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.xml.rpc.ServiceException;
+
 import edu.phema.jaxb.knime.Config;
 import edu.phema.jaxb.knime.Entry;
 import edu.phema.jaxb.knime.EntryType;
 import edu.phema.jaxb.knime.ObjectFactory;
+import gov.nih.nlm.mor.axis.services.RxNormDBService.DBManager;
+import gov.nih.nlm.mor.axis.services.RxNormDBService.DBManagerService;
+import gov.nih.nlm.mor.axis.services.RxNormDBService.DBManagerServiceLocator;
 
 /**
  * @author Huan
@@ -69,6 +76,22 @@ public class Toolkit {
 	
 	public static String readFile(String path) throws IOException {
 		return readFile(path, Charset.defaultCharset());
+	}
+	
+	public static DBManager getRxnormManager() {
+		String rxhost = "http://mor.nlm.nih.gov";
+		String rxURI = rxhost + "/axis/services/RxNormDBService";
+		DBManager dbmanager = null;
+		// Locate the RxNorm API web service
+		try {
+			URL rxURL = new URL(rxURI);
+			DBManagerService rxnormService = new DBManagerServiceLocator();
+			dbmanager = rxnormService.getRxNormDBService(rxURL);
+		} catch (MalformedURLException | ServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return dbmanager;
 	}
 	
 	public static void addWorkflowOverHeads(Config inConfig, ObjectFactory factory){

@@ -26,6 +26,7 @@ import edu.phema.QdmKnimeInterfaces.TemporalRelationshipInterface.TemporalTypeCo
 import edu.phema.QdmKnimeInterfaces.TemporalRelationshipInterface.Unit;
 import edu.phema.knime.exceptions.SetUpIncompleteException;
 import edu.phema.knime.exceptions.WrittenAlreadyException;
+import edu.phema.vsac.VsacConnector;
 
 /**
  * @author Huan
@@ -110,6 +111,17 @@ public class WorkflowTest {
 		// Need to add configurations
 		
 		project.addKnimeNode(nodeD);
+		
+		VsacConnector vsac = new VsacConnector("henryhmo", "2525WestEnd");
+		
+		int nodeEId = newNode();
+		QdmDataElement nodeE = new QdmDataElement(nodeEId);
+		nodeE.setQdmDataType("Medication Active");
+		nodeE.setX(100);
+		nodeE.setY(300);
+		nodeE.setValueSet(vsac.getValueSetJaxb("2.16.840.1.113883.3.117.1.7.1.824"));
+		nodeE.setQdmDataElementText("check rxnorm");
+		project.addKnimeNode(nodeE);
 		
 		
 		/*

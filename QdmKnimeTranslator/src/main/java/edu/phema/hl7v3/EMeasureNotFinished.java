@@ -19,7 +19,7 @@ import edu.phema.jaxb.uvqm.hl7v3.POQMMT000001UVQualityMeasureDocument;
  * @author moh
  *
  */
-public class EMeasure {
+public class EMeasureNotFinished {
 
 	/**
 	 * 
@@ -27,7 +27,7 @@ public class EMeasure {
 	
 	private final JAXBElement<POQMMT000001UVQualityMeasureDocument> emeasureRoot;
 	
-	public EMeasure(String emeasureXml) throws JAXBException {
+	public EMeasureNotFinished(String emeasureXml) throws JAXBException {
 		// TODO Auto-generated constructor stub
 		emeasureRoot = JAXBContext.newInstance(
 				POQMMT000001UVQualityMeasureDocument.class)
@@ -53,7 +53,7 @@ public class EMeasure {
 		// TODO Auto-generated method stub
 		String fileDir = 
 				"src/main/resources/hqmf_queryHealth/samples/HQMF_Measure60.xml";
-		EMeasure em = new EMeasure(Toolkit.readFile(fileDir));
+		EMeasureNotFinished em = new EMeasureNotFinished(Toolkit.readFile(fileDir));
 	}
 
 }
