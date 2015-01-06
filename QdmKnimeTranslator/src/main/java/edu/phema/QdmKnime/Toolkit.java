@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.xml.rpc.ServiceException;
 
@@ -65,6 +66,30 @@ public class Toolkit {
 		return ui_settings;
 	}
 	
+	public static HashMap <String, Config> indexConfigsInConfig (Config inConfig){
+		HashMap <String, Config> ret = new HashMap <String, Config>();
+		Object[] subNodes = inConfig.getEntryOrConfig().toArray();
+		for (Object node : subNodes){
+			if (node.getClass() == Config.class){
+				Config configNode = (Config) node;
+				ret.put(configNode.getKey(), configNode);
+			}
+		}
+		return ret;
+	}
+
+	public static HashMap <String, Entry> indexEntriesInConfig (Config inConfig){
+		HashMap <String, Entry> ret = new HashMap <String, Entry>();
+		Object[] subNodes = inConfig.getEntryOrConfig().toArray();
+		for (Object node : subNodes){
+			if (node.getClass() == Entry.class){
+				Entry entryNode = (Entry) node;
+				ret.put(entryNode.getKey(), entryNode);
+			}
+		}
+		return ret;
+	}
+
 	
 	/*
 	 * Copy from http://stackoverflow.com/questions/326390/how-to-create-a-java-string-from-the-contents-of-a-file
