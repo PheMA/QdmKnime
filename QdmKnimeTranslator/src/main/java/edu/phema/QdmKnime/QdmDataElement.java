@@ -708,4 +708,19 @@ public class QdmDataElement extends MetaNode implements QdmDataElementInterface 
 		return variablesForSQL.keySet().toArray(new String[variablesForSQL.size()]);
 	}
 
+	@Override
+	public int getOutputElementId(int port) throws IndexOutOfBoundsException {
+		// TODO Auto-generated method stub
+		if (port > 0)
+			throw new IndexOutOfBoundsException();
+		return this.getId();
+	}
+
+	@Override
+	public void setInputElementId(int port, int elementId)
+			throws IndexOutOfBoundsException {
+		// TODO Auto-generated method stub
+		throw new IndexOutOfBoundsException("QDM Data Element has no input elements! ");
+	}
+
 }

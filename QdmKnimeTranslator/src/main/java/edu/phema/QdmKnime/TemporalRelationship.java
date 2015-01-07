@@ -418,5 +418,30 @@ public class TemporalRelationship extends MetaNode implements
 		return unit;
 	}
 
+	@Override
+	public int getOutputElementId(int port) throws IndexOutOfBoundsException {
+		// TODO Auto-generated method stub
+		int ret = Integer.MIN_VALUE;
+		if (port == 0){
+			ret = this.getLeftId();
+		} else if (port == 1) {
+			ret = this.getRightId();
+		} else {
+			throw new IndexOutOfBoundsException();
+		}
+		return ret;
+	}
+
+	@Override
+	public void setInputElementId(int port, int elementId)
+			throws IndexOutOfBoundsException {
+		// TODO Auto-generated method stub
+		if (port == 0)
+			this.setLeftId(elementId);
+		else if (port == 1)
+			this.setRightId(elementId);
+		else throw new IndexOutOfBoundsException();
+	}
+
 
 }

@@ -172,6 +172,60 @@ public class RowFilter {
 
 	}
 	
+	public void setStringMatching(String pattern, boolean caseSensitive, 
+			boolean hasWildCards, boolean isRegExpr){
+		HashMap <String, Entry> entriesMap = Toolkit.indexEntriesInConfig(rowFilterNode);
+		HashMap <String, Config> configsMap = Toolkit.indexConfigsInConfig(rowFilterNode);
+		if (entriesMap.containsKey("RowFilter_TypeID")){
+			entriesMap.get("RowFilter_TypeID").setValue("StringComp_RowFilter");
+		} else {
+			rowFilterNode.getEntryOrConfig().add(
+					Toolkit.makeEntry("RowFilter_TypeID", EntryType.XSTRING, 
+							"StringComp_RowFilter", objectFactory));
+		}
+		if (configsMap.containsKey("lowerBound")){
+			rowFilterNode.getEntryOrConfig().remove(configsMap.get("lowerBound"));
+		}
+		if (configsMap.containsKey("upperBound")){
+			rowFilterNode.getEntryOrConfig().remove(configsMap.get("upperBound"));
+		}
+		
+		
+		if (entriesMap.containsKey("Pattern")){
+			entriesMap.get("Pattern").setValue(pattern);
+		} else {
+			rowFilterNode.getEntryOrConfig().add(
+					Toolkit.makeEntry("Pattern", EntryType.XSTRING, 
+							pattern, objectFactory));
+		}		
+		if (entriesMap.containsKey("CaseSensitive")){
+			entriesMap.get("CaseSensitive").setValue(String.valueOf(caseSensitive));
+		} else {
+			rowFilterNode.getEntryOrConfig().add(
+					Toolkit.makeEntry("CaseSensitive", EntryType.XBOOLEAN, 
+							String.valueOf(caseSensitive), objectFactory));
+		}
+		if (entriesMap.containsKey("hasWildCards")){
+			entriesMap.get("hasWildCards").setValue(String.valueOf(
+					isRegExpr ? false : hasWildCards));
+		} else {
+			rowFilterNode.getEntryOrConfig().add(
+					Toolkit.makeEntry("hasWildCards", EntryType.XBOOLEAN, 
+							String.valueOf(isRegExpr ? 
+									false : hasWildCards), objectFactory));
+		}
+		if (entriesMap.containsKey("isRegExpr")){
+			entriesMap.get("isRegExpr").setValue(String.valueOf(isRegExpr));
+		} else {
+			rowFilterNode.getEntryOrConfig().add(
+					Toolkit.makeEntry("isRegExpr", EntryType.XBOOLEAN, 
+							String.valueOf(isRegExpr), objectFactory));
+		}
+
+
+
+	}
+	
 	/*
 	 * upper/lower bounds can be null
 	 * */
@@ -332,6 +386,7 @@ public class RowFilter {
 		obj.setRangeValues(CreateTableColumnClassEnum.Double, new Double (12.0), new Double (7.0));
 		// obj.setRangeValues(CreateTableColumnClassEnum.Int, new Integer (12), null);
 		// obj.setMissingValuesMatch();
+		obj.setStringMatching("\\d+", false, true, true);
 		System.out.println(obj.getSettings());
 	}
 

@@ -9,6 +9,6 @@ public interface LogicalRelationshipInterface extends NodeInterface {
 	void setRightId (int element_node_id);
 	// void setLogicalTypeCode(LogicalTypeCode typeCode);  // Should be initialized in constructors
 	LogicalTypeCode getLogicalTypeCode();
-	int getOutputElementId(int port) throws IndexOutOfBoundsException;  // null if it is patient level data?
+	// int getOutputElementId(int port) throws IndexOutOfBoundsException;  // null if it is patient level data?
 	EntityLevel getOutputEntityLevel(int port) throws IndexOutOfBoundsException;
 }

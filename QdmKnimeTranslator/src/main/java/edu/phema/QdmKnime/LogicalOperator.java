@@ -384,5 +384,18 @@ public class LogicalOperator extends MetaNode implements LogicalRelationshipInte
 		return GoodOutPorts;
 	}
 
+	@Override
+	public void setInputElementId(int port, int elementId)
+			throws IndexOutOfBoundsException {
+		// TODO Auto-generated method stub
+		if (port == 0) {
+			this.setLeftId(elementId);
+		} else if (port == 1){
+			this.setRightId(elementId);
+		} else
+			throw new IndexOutOfBoundsException();
+		
+	}
+
 
 }
