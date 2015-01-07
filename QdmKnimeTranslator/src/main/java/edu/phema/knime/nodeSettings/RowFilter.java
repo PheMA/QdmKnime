@@ -79,6 +79,7 @@ public class RowFilter {
 		int modelPos = xmlRootNode.getValue().getEntryOrConfig().indexOf(model);
 		
 		nodeAnnotationConfig = objectFactory.createConfig();
+		nodeAnnotationConfig.setKey("nodeAnnotation");
 		
 		xmlRootNode.getValue().getEntryOrConfig().add(modelPos + 1, nodeAnnotationConfig);
 		
@@ -344,6 +345,17 @@ public class RowFilter {
 					columnName, objectFactory));
 		}
 	}
+
+	public String getColumnName (){
+		String columnName = "";
+		HashMap <String, Entry> entriesMap = Toolkit.indexEntriesInConfig(rowFilterNode);
+		if (entriesMap.containsKey("columnName")){
+			columnName = entriesMap.get("columnName").getValue();
+		} 
+		
+		return columnName;
+	}
+
 	
 	public void setAnnotationText (String text){
 		HashMap <String, Entry> entriesMap = 

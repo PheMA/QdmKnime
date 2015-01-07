@@ -14,6 +14,7 @@ import net.lingala.zip4j.exception.ZipException;
 
 import org.junit.Test;
 
+import edu.phema.QdmKnime.Attribute;
 import edu.phema.QdmKnime.Connection;
 import edu.phema.QdmKnime.KnimeProject;
 import edu.phema.QdmKnime.LogicalOperator;
@@ -112,17 +113,24 @@ public class WorkflowTest {
 		
 		project.addKnimeNode(nodeD);
 		
-		VsacConnector vsac = new VsacConnector("henryhmo", "2525WestEnd");
+		//VsacConnector vsac = new VsacConnector("", ""); // UMLS username, passoword
 		
 		int nodeEId = newNode();
 		QdmDataElement nodeE = new QdmDataElement(nodeEId);
 		nodeE.setQdmDataType("Medication Active");
 		nodeE.setX(100);
 		nodeE.setY(300);
-		nodeE.setValueSet(vsac.getValueSetJaxb("2.16.840.1.113883.3.117.1.7.1.824"));
+		//nodeE.setValueSet(vsac.getValueSetJaxb("2.16.840.1.113883.3.117.1.7.1.824"));
 		nodeE.setQdmDataElementText("check rxnorm");
 		project.addKnimeNode(nodeE);
 		
+		int nodeFId = newNode();
+		Attribute nodeF = new Attribute(nodeFId);
+		nodeF.setAttributeName("dose");
+		nodeF.setInputElementId(0, nodeEId);
+		nodeF.setMode_Comparison(null, 20.0);
+		//nodeF.setMode_isPresent();
+		project.addKnimeNode(nodeF);
 		
 		/*
 		 *  Now I am going to set up a connection
@@ -132,8 +140,8 @@ public class WorkflowTest {
 		int connAId = newConnection();
 		Connection connA = new Connection(connAId);
 		project.addKnimeConnection(connA);
-		connA.setSource(nodeAId, 1);
-		connA.setDest(nodeBId, 1);
+		connA.setSource(nodeA.getId(), 1);
+		connA.setDest(nodeB.getId(), 1);
 //		connA.addBendpoint(100, 100);
 		
 		int connBId = newConnection();
@@ -145,8 +153,14 @@ public class WorkflowTest {
 		int connCId = newConnection();
 		Connection connC = new Connection(connCId);
 		project.addKnimeConnection(connC);
-		connC.setSource(nodeDId, 0);
-		connC.setDest(connAId, 0);
+		connC.setSource(nodeD.getId(), 0);
+		connC.setDest(nodeA.getId(), 0);
+		
+		int connDId = newConnection();
+		Connection connD = new Connection(connDId);
+		project.addKnimeConnection(connD);
+		connD.setSource(nodeE.getId(), 0);
+		connD.setDest(nodeF.getId(), 1);
 		
 		project.buildProject();
 		

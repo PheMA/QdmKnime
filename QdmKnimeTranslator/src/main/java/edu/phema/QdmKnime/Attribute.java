@@ -13,6 +13,7 @@ import java.util.Random;
 import javax.xml.bind.JAXBException;
 
 import net.lingala.zip4j.exception.ZipException;
+import edu.phema.Enum.QdmKnime.CreateTableColumnClassEnum;
 import edu.phema.QdmKnimeInterfaces.NodeInterface;
 import edu.phema.jaxb.knime.Config;
 import edu.phema.jaxb.knime.EntryType;
@@ -41,6 +42,7 @@ public class Attribute implements NodeInterface {
 
 	private final RowFilter rowFilter;
 	
+	
 	/**
 	 * @throws IOException 
 	 * @throws JAXBException 
@@ -50,6 +52,7 @@ public class Attribute implements NodeInterface {
 		// TODO Auto-generated constructor stub
 		try {
 			rowFilter = new RowFilter();
+			rowFilter.setAnnotationText("Attribute");
 		} catch (JAXBException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -62,6 +65,7 @@ public class Attribute implements NodeInterface {
 		this.id = id;
 		try {
 			rowFilter = new RowFilter();
+			rowFilter.setAnnotationText("Attribute");
 		} catch (JAXBException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,7 +73,32 @@ public class Attribute implements NodeInterface {
 		}
 	}
 	
-
+	public void setMode_isPresent(){
+		rowFilter.setMissingValuesMatch();
+		rowFilter.setIncludeOrExclude(false);
+	}
+	
+	public void setMode_Comparison(Number upper, Number lower){
+		rowFilter.setRangeValues(CreateTableColumnClassEnum.Double, upper, lower);
+		rowFilter.setIncludeOrExclude(true);
+	}
+	
+	public void setMode_textTool(String pattern, boolean caseSensitive, 
+			boolean hasWildCards, boolean isRegExpr){
+		rowFilter.setStringMatching(pattern, caseSensitive, hasWildCards, isRegExpr);
+		rowFilter.setIncludeOrExclude(true);
+	}
+	
+	public void setAttributeName (String attribute){
+		//this.attributeName = attribute;
+		rowFilter.setColumnName(attribute);
+		rowFilter.setAnnotationText("Attribute: " + attribute);
+	}
+	
+	public String getAttributeName (){
+		return rowFilter.getColumnName();
+	}
+	
 	/* (non-Javadoc)
 	 * @see edu.phema.QdmKnimeInterfaces.NodeInterface#setWorkflowRoot(java.lang.String)
 	 */
@@ -120,6 +149,7 @@ public class Attribute implements NodeInterface {
 		if (workflowRoot.getNameCount() == 0){
 			throw new SetUpIncompleteException("Workflow root is not set up for Node" + this.getId());
 		}
+		nodeFolderPath.toFile().mkdirs();
 		Path settingsXml = nodeFolderPath.resolve("settings.xml");
 		PrintWriter outStream = new PrintWriter(settingsXml.toFile());
 		outStream.print(rowFilter.getSettings());
